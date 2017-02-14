@@ -19,3 +19,6 @@ app.autodiscover_tasks()
 
 # start celery with the following command from solutions root directory
 #celery -A kunst worker -l info
+
+
+#remember to add a media folder in the project root directory 
