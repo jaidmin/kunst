@@ -21,4 +21,4 @@ app.autodiscover_tasks()
 #celery -A kunst worker -l info
 
 
-#remember to add a media folder in the project root directory 
+#remember to add a media folder in the project root directory
