@@ -1,15 +1,7 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>images</title>
-</head>
-<body>
-<h1>images</h1>
+{% extends 'base.html' %}
 
 
-
+{%  block content %}
 {% for image in images %}
     <div class="row">
     <div class="col s6 offset-s1 sm offset-m1 l6 offset-l1">
@@ -24,6 +16,4 @@
 {% endfor %}
 
 
-
-</body>
-</html>
+{% endblock %}

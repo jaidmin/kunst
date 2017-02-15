@@ -11,6 +11,8 @@ from models import originalImage, augmentedImage
 from tasks import generateAugmentedImage
 from django.shortcuts import redirect
 from django.http import HttpResponse
+from django.contrib.auth import authenticate, login
+
 
 def index(request):
     return render(request,'index.html')
@@ -65,3 +67,4 @@ def exists(request):
             return HttpResponse(str(askedForImageId)+ " exists", status=200)
         else:
             return HttpResponse(str(askedForImageId)+ " does not exists", status=404)
+
