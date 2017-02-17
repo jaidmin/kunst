@@ -19,8 +19,9 @@ def index(request):
 
 
 def images(request):
-    originalImages = originalImage.objects.all()
-    return render(request,'images.html',{'images': originalImages})
+    #originalImages = originalImage.objects.all()
+    augmentedImages = augmentedImage.objects.all()
+    return render(request,'images.html',{'images': augmentedImages})
 
 
 def upload(request):
@@ -44,12 +45,13 @@ def upload(request):
             finalImage.save()
 
 
-            # following section is to move to a celery task
+            # following section is to move to a celery task // legacy // is already in celery
             # demo that image can be encoded and decoded to a base64 string
+            #  // use base64 rather than directly numpy array because of the size  (50* bigger)
             imageString = base64.b64encode(st.getvalue())
 
             #call to celery
-            generateAugmentedImage.delay(imageString,userDescription=userDescription,originalImageId=finalImage.id)
+            generateAugmentedImage.delay(imageStringEncoded=imageString,userDescription=userDescription,originalImageId=finalImage.id)
             return redirect('images')
 
     form = UploadOriginalImageForm()

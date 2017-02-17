@@ -4,12 +4,12 @@
 {%  block content %}
 {% for image in images %}
     <div class="row">
-    <div class="col s6 offset-s1 sm offset-m1 l6 offset-l1">
+
+    <img src="{{   image.originalImage.file.url }}"> </img>
+
     <img src="{{   image.file.url  }}"> </img>
-        </div>
-        <div class="col s4 offset-s1 sl offset-l1 m4 offset-m1">
-    <h3>Nutzerbeschreibung: {{ image.userDescription }}</h3>
-</div>
+
+
 
     </div>
 
