@@ -30,7 +30,7 @@
             </div>
             <div class="row">
                 <div class="input-field col s4 push-s4 center">
-                    <input id="id_public" name="public" type="checkbox" required checked="checked" class="left" {% if not user.is_authenticated %}  disabled="disabled" {% endif %}>
+                    <input id="id_public" name="public" type="checkbox"  checked="checked" class="left" {% if not user.is_authenticated %}  disabled="disabled" {% endif %}>
                     <label for="id_public" class="left">add to public gallery</label>
                     <button type="submit" name="_submit" class="btn right">Submit</button>
                 </div>

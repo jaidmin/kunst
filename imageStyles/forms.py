@@ -6,7 +6,7 @@ from django import forms
 class UploadOriginalImageForm(ModelForm):
     class Meta:
         model = originalImage
-        fields = ['userDescription', 'file']
+        fields = ['userDescription', 'file','public']
 
 
 class RegisterForm(Form):

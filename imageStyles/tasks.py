@@ -33,7 +33,7 @@ import logging
 
 
 @shared_task
-def generateAugmentedImage(imageStringEncoded,originalImageId, userDescription):
+def generateAugmentedImage(imageStringEncoded,originalImageId, userDescription, public):
     imageStringDecoded = BytesIO(base64.b64decode(imageStringEncoded))
     incomingImage = PIL.Image.open(imageStringDecoded)
     time = timezone.now()
@@ -45,8 +45,18 @@ def generateAugmentedImage(imageStringEncoded,originalImageId, userDescription):
     processedPILImage.save(processedImageBytes,'jpeg')
     new_processed = InMemoryUploadedFile(processedImageBytes, None, imageName, "image/jpeg", len(processedImageBytes.getvalue()), None)
 
-    original_image = incomingImage.resize(processedPILImage.size)
-    thumbnail_new = create_thumbnail(original_image,processedPILImage)
+    #create thumbnail
+    #resize copy of augmented, later resize original to same size in order to pass to create_thumbnail
+    augmented_thumbnail = processedPILImage.copy()
+    baseheight = 200
+    hpercent = (baseheight / float(augmented_thumbnail.size[1]))
+    wsize = int((float(augmented_thumbnail.size[0]) * float(hpercent)))
+    augmented_thumbnail = augmented_thumbnail.resize((wsize, baseheight))
+
+    #resize original to thumbnailsize
+    original_image = incomingImage.copy()
+    original_image = original_image.resize(augmented_thumbnail.size)
+    thumbnail_new = create_thumbnail(original_image,augmented_thumbnail)
 
     thumbnail_name = str(uuid.uuid4()) + '.jpg'
     thumbnail_bytes = BytesIO()
@@ -59,7 +69,9 @@ def generateAugmentedImage(imageStringEncoded,originalImageId, userDescription):
         pubDate=time,
         options="still have to think about that",
         originalImage= originalImage.objects.get(id=originalImageId),
-        thumbnail = thumbnail_processed
+        thumbnail = thumbnail_processed,
+        public = public,
+        owner= originalImage.objects.get(id=originalImageId).owner
     )
     finalaugmented.save()
 

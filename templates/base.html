@@ -30,9 +30,9 @@
         <a id="logo-container" href="{% url 'index' %}" class="brand-logo center">UyA - Upcycle your Art</a>
         <ul class="right hide-on-med-and-down">
             <li><a href="{% url 'upload' %}">Upload</a></li>
-            <li><a href="{% url 'images' %}">Images</a></li>
+            <li><a href="{% url 'images_public' %}">Images</a></li>
             {% if user.is_authenticated %}
-                <li><a href="{% url 'images' %}">My Images</a></li>
+                <li><a href="{% url 'images_private' %}">My Images</a></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
             {% else %}
                 <li><a href="{% url 'login' %}">Login</a></li>
@@ -43,7 +43,7 @@
 
         <ul id="nav-mobile" class="side-nav">
             <li><a href="{% url 'upload' %}">Upload</a></li>
-            <li><a href="{% url 'images' %}">Images</a></li>
+            <li><a href="{% url 'images_public' %}">Images</a></li>
         </ul>
         <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
     </div>

@@ -20,11 +20,17 @@ def index(request):
     return render(request, 'index.html')
 
 
-def images(request):
+def images_private(request):
     # originalImages = originalImage.objects.all()
-    augmentedImages = augmentedImage.objects.all()
+    augmentedImages = augmentedImage.objects.filter(owner=request.user)
     renderCount = augmentedImages.count()
-    return render(request, 'images.html', {'images': augmentedImages, 'renderCount': renderCount})
+    return render(request, 'images.html', {'images': augmentedImages, 'renderCount': renderCount, 'scope': "private"})
+
+def images_public(request):
+    # originalImages = originalImage.objects.all()
+    augmentedImages = augmentedImage.objects.filter(public= True)
+    renderCount = augmentedImages.count()
+    return render(request, 'images.html', {'images': augmentedImages, 'renderCount': renderCount,'scope': "public"})
 
 
 def upload(request):
@@ -32,6 +38,7 @@ def upload(request):
         form = UploadOriginalImageForm(request.POST, request.FILES)
         # check if form is valid
         if form.is_valid():
+
             uploadedFile = form.cleaned_data['file']
 
             # resize image
@@ -49,9 +56,15 @@ def upload(request):
             userDescription = "test"
             userDescription = form.cleaned_data['userDescription']
 
+            if request.user.is_authenticated():
+                owner = request.user
+            else:
+                owner = None
+
+
             public = form.cleaned_data['public']
 
-            finalImage = originalImage(file=processedFile, userDescription=userDescription, pubDate=time,public=public)
+            finalImage = originalImage(file=processedFile, userDescription=userDescription, pubDate=time,public=public,owner=owner)
             finalImage.save()
 
             # following section is to move to a celery task // legacy // is already in celery
@@ -61,13 +74,17 @@ def upload(request):
 
             # call to celery
             generateAugmentedImage.delay(imageStringEncoded=imageString, userDescription=userDescription,
-                                         originalImageId=finalImage.id)
-            return redirect('images')
+                                         originalImageId=finalImage.id,public = finalImage.public)
+            if owner is not None:
+                return redirect('images_private')
+            else:
+                return redirect('images_public')
 
     form = UploadOriginalImageForm()
     return render(request, 'upload.html', {'form': form})
 # think about how to make the thumbnails (half half style) -> numpy.tril gives me the lower traingle of a matrix, pil can
-#merge with a filter applid to one image -> use one thumbnail make the filter all zeros in the upper triangle al 255 or 1 not sure, everywhere else, than merge. later a softer approach could be applied 
+# merge with a filter applid to one image -> use one thumbnail make the filter all zeros in the upper
+# triangle al 255 or 1 not sure, everywhere else, than merge. later a softer approach could be applied
 
 def register(request):
     form = RegisterForm(request.POST)
@@ -86,6 +103,12 @@ def register(request):
 
     return render(request, template_name='registration/register.html')
 
-def currentcount(request):
-    currentCount = augmentedImage.objects.all().count()
+def currentcount_private(request):
+    currentCount = augmentedImage.objects.filter(owner= request.user).count()
     return JsonResponse({'currentCount':currentCount})
+
+
+def currentcount_public(request):
+    currentCount = augmentedImage.objects.filter(public=True).count()
+    return JsonResponse({'currentCount':currentCount})
+

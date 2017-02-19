@@ -1,55 +1,54 @@
 {% extends 'base.html' %}
 
 
+
 {% block content %}
+    <div class="container">
 
+        {% for image in images %}
 
-    {% for image in images %}
-
-        <div class="row">
-            <div class="col s4 push-s2">
-                <div class="card">
-                    <div class="card-image">
-                        <img class="materialboxed" src="{{ image.originalImage.file.url }}">
-                    </div>
-                    <div class="card-content">
-                        <p>{{ image.originalImage.userDescription }}</p>
-                    </div>
+            {% if forloop.counter0|divisibleby:4 %}
+                <div class="row">
+            {% endif %}
+        <div class="col s2 push-s2">
+            <div class="card">
+                <div class="card-image">
+                    <img src="{{ image.thumbnail.url }}">
                 </div>
-            </div>
-            <div class="col s4 push-s2">
-                <div class="card">
-                    <div class="card-image">
-                        <img class="materialboxed" src="{{ image.file.url }}">
-                    </div>
-                    <div class="card-content">
-                        <p>{{ image.userDescription }}</p>
-                    </div>
+                <div class="card-content">
+                    <p>{{ image.userDescription }}</p>
                 </div>
             </div>
         </div>
+        {% if  forloop.counter0|add:1|divisibleby:4 %}
+            </div>
+        {% endif %}
 
-    {% endfor %}
+        {% endfor %}
+    </div>
+     <!-- the closing div is necessesary even though it seemingly doesnt close anythin-->
+</div>
+
 
     <script type="text/javascript">
 
 
-    function checkIfChanged(currentCount) {
-        renderCount = {{ renderCount }};
+        function checkIfChanged(currentCount) {
+            renderCount = {{ renderCount }};
 
-        console.log("renderCount: ", renderCount);
-        console.log("currentCount:", currentCount);
-        if(currentCount != renderCount) {
-            location.reload(true);
+            console.log("renderCount: ", renderCount);
+            console.log("currentCount:", currentCount);
+            if (currentCount != renderCount) {
+                location.reload(true);
+            }
+
         }
 
-    }
-
-    setInterval(function(renderCount) {
-        $.getJSON(url = "{% url 'currentcount' %}", function( data ) {
-            checkIfChanged(data.currentCount);
-        });
-}, 5000);
+        setInterval(function (renderCount) {
+            $.getJSON(url = "{% if scope == "private" %}{% url "currentcount_private" %} {% else %} {% url "currentcount_public" %} {% endif %}", function (data) {
+                checkIfChanged(data.currentCount);
+            });
+        }, 5000);
 
     </script>
 {% endblock %}
