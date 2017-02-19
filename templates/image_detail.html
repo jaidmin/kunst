@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+
+{% block  content %}
+
+        <div class="row">
+            <div class="col s4 center">
+                <img src="{{ original_image.file.url }}">
+            </div>
+
+            <div class="col s8 center">
+                <div class="carousel">
+                    {% for image in augmented_images %}
+                        <a class="carousel-item"><img src="{{ image.file.url }}"></a>
+
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+{% endblock %}

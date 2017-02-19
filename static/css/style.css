@@ -55,3 +55,9 @@ p {
 footer.page-footer {
   margin: 0;
 }
+
+.carousel-item .carousel > img {
+ height: 400px !important;
+    width:  400px !important;
+}
+

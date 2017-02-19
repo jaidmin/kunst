@@ -9,7 +9,7 @@ import PIL.Image
 from django.utils import timezone
 from models import originalImage, augmentedImage
 from tasks import generateAugmentedImage
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
@@ -112,3 +112,9 @@ def currentcount_public(request):
     currentCount = augmentedImage.objects.filter(public=True).count()
     return JsonResponse({'currentCount':currentCount})
 
+
+
+def image_detail(request,original_image_id):
+    original_image = get_object_or_404(originalImage, id = original_image_id)
+    augmented_images = augmentedImage.objects.filter(originalImage=original_image)
+    return render(request,template_name="image_detail.html",context={'original_image': original_image, 'augmented_images': augmented_images })

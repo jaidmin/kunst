@@ -6,7 +6,7 @@ urlpatterns = [
     url(r'upload', views.upload, name="upload"),
     url(r'^images/private', views.images_private, name="images_private"),
     url(r'^images/public', views.images_public, name="images_public"),
-
+    url(r'^images/detail/(?P<original_image_id>.*)', views.image_detail, name="image_detail"),
     url(r'^currentcount/private', views.currentcount_private, name="currentcount_private"),
     url(r'^currentcount/public', views.currentcount_public, name="currentcount_public"),
 

@@ -13,7 +13,7 @@
         <div class="col s2 push-s2">
             <div class="card">
                 <div class="card-image">
-                    <img src="{{ image.thumbnail.url }}">
+                    <a href="{% url 'image_detail' image.originalImage.id %}"> <img src="{{ image.thumbnail.url }}"></a>
                 </div>
                 <div class="card-content">
                     <p>{{ image.userDescription }}</p>
