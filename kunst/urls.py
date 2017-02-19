@@ -21,15 +21,13 @@ from django.contrib import admin
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-
+from imageStyles import views
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    #url(r'^logout/$', auth_views.logout, name='logout'),
-    #url(r'^login/$', auth_views.login, name='login'),
-    url(r'^logout/$', auth_views.logout, name='logout', kwargs={'next_page': '/'}),
-    url('^',include('django.contrib.auth.urls')),
-    url('^', include('imageStyles.urls'))
+                  url(r'^admin/', admin.site.urls),
+                  url(r'^register/$', views.register, name='register'),
+                  url(r'^login/$', auth_views.login, name='login'),
+                  url(r'^logout/$', auth_views.logout, name='logout', kwargs={'next_page': '/'}),
+                  url(r'^', include('imageStyles.urls'))
 
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL)
-
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL)

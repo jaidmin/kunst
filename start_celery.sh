@@ -1,1 +1,2 @@
-celery -A kunst worker -l info
+celery -A kunst worker -l info --concurrency=1
+

@@ -1,42 +1,31 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-
-
-
-
-
-
-       <script
-			  src="https://code.jquery.com/jquery-3.1.1.min.js"
-			  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-			  crossorigin="anonymous"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
-
-  <!-- Compiled and minified CSS -->
-
-  <!-- Compiled and minified JavaScript -->
-
-    {% include 'material/includes/material_css.html' %}
-    {% include 'material/includes/material_js.html' %}
-    {% load material_form %}
-    {% load static %}
-    {% load staticfiles %}
-
-
-
-    <meta charset="UTF-8">
-    <title>upload</title>
-</head>
-<body>
+{% extends "base.html" %}
+{%  block content %}
 <h1>upload</h1>
-<form method="POST" enctype="multipart/form-data">
+    <div class="row">
+<form method="POST" enctype="multipart/form-data" class="col s12" >
     {% csrf_token %}
-    {% form form=form %}{% endform %}
+     <div class="input-field col s6">
+    <input placeholder="userDescription" id="id_userDescription" type="text" name="userDescription" required>
+    <label for="userDescription">User Description</label>
+     </div>
+
+    <div class="input-field col s6">
+
+    <div class="file-field input-field">
+      <div class="btn">
+        <span>File</span>
+        <input id="id_file" name="file" type="file" required>
+      </div>
+      <div class="file-path-wrapper">
+        <input  class="file-path validate" type="text">
+      </div>
+    </div>
+         </div>
     <button type="submit" name="_submit" class="btn">Submit</button>
+
 </form>
-</body>
-</html>
+
+    </div>
+
+
+{% endblock %}

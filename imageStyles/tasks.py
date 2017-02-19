@@ -21,6 +21,15 @@ from magenta.models.image_stylization import image_utils
 from magenta.models.image_stylization import model
 from magenta.models.image_stylization import ops
 import uuid
+from scipy.ndimage import convolve
+import PIL.Image
+
+
+# import the logging library
+import logging
+
+# Get an instance of a logger
+
 
 
 @shared_task
@@ -31,16 +40,26 @@ def generateAugmentedImage(imageStringEncoded,originalImageId, userDescription):
     imageArray = np.expand_dims((np.array(incomingImage,dtype='float32') / 255),0)
     results = _multiple_images(imageArray,[3])
     imageName = str(uuid.uuid4()) + '.jpg'
-    processedPILImage = results[0][1]
+    processedPILImage = results[1]
     processedImageBytes = BytesIO()
     processedPILImage.save(processedImageBytes,'jpeg')
     new_processed = InMemoryUploadedFile(processedImageBytes, None, imageName, "image/jpeg", len(processedImageBytes.getvalue()), None)
+
+    original_image = incomingImage.resize(processedPILImage.size)
+    thumbnail_new = create_thumbnail(original_image,processedPILImage)
+
+    thumbnail_name = str(uuid.uuid4()) + '.jpg'
+    thumbnail_bytes = BytesIO()
+    thumbnail_new.save(thumbnail_bytes,'jpeg')
+    thumbnail_processed = InMemoryUploadedFile(thumbnail_bytes,None,thumbnail_name,"image/jpeg",len(thumbnail_bytes.getvalue()), None)
+
     finalaugmented = augmentedImage(
         file=new_processed,
         userDescription=userDescription,
         pubDate=time,
         options="still have to think about that",
-        originalImage= originalImage.objects.get(id = originalImageId)
+        originalImage= originalImage.objects.get(id=originalImageId),
+        thumbnail = thumbnail_processed
     )
     finalaugmented.save()
 
@@ -60,7 +79,7 @@ def _multiple_images(input_image, which_styles):
   """Stylizes an image into a set of styles and returns array of tuples with style as first and PIL image as second element"""
   with tf.Graph().as_default(), tf.Session() as sess:
     stylized_images = model.transform(
-        tf.concat_v2([input_image for _ in range(len(which_styles))], 0),
+        input_image,
         normalizer_params={
             'labels': tf.constant(which_styles),
             'num_categories': 10, # monet has 10 categories varied has 34
@@ -68,9 +87,25 @@ def _multiple_images(input_image, which_styles):
             'scale': True})
     _load_checkpoint(sess, '/home/jaidmin/PycharmProjects/kunst/imageStyles/tensorflow_models/monet.ckpt')
 
-    stylized_images = stylized_images.eval()
+    stylized_image = stylized_images.eval()
     results = []
-    for which, stylized_image in zip(which_styles, stylized_images):
-        one_image = PIL.Image.fromarray((stylized_images[0] * 255).astype('uint8'))
-        results.append((which,one_image))
-    return results
+    one_image = PIL.Image.fromarray((stylized_image[0] * 255).astype('uint8'))
+    return (which_styles,one_image)
+
+
+
+mask_skeleton =np.rot90(np.triu(np.ones((1000,1000))*255).astype('float32'))
+maskimage_skeleton = PIL.Image.fromarray(mask_skeleton.astype('uint8'),mode='L')
+average_convolution = np.ones((50,50))/2500
+
+
+def create_thumbnail(original_image, augmented_image,maskimage_skeleton = maskimage_skeleton,convolution = average_convolution):
+    thumbnail = original_image.copy()
+    maskimage_skeleton = maskimage_skeleton.resize(original_image.size)
+    mask = np.array(maskimage_skeleton)
+    mask = convolve(mask, convolution)
+    mask = mask.astype('uint8')
+    maskimage = PIL.Image.fromarray(mask, mode='L')
+    thumbnail.paste(augmented_image,mask = maskimage )
+    return thumbnail
+
