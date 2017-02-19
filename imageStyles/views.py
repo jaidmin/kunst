@@ -48,7 +48,10 @@ def upload(request):
             time = timezone.now()
             userDescription = "test"
             userDescription = form.cleaned_data['userDescription']
-            finalImage = originalImage(file=processedFile, userDescription=userDescription, pubDate=time)
+
+            public = form.cleaned_data['public']
+
+            finalImage = originalImage(file=processedFile, userDescription=userDescription, pubDate=time,public=public)
             finalImage.save()
 
             # following section is to move to a celery task // legacy // is already in celery

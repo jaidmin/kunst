@@ -1,31 +1,42 @@
 {% extends "base.html" %}
-{%  block content %}
-<h1>upload</h1>
-    <div class="row">
-<form method="POST" enctype="multipart/form-data" class="col s12" >
-    {% csrf_token %}
-     <div class="input-field col s6">
-    <input placeholder="userDescription" id="id_userDescription" type="text" name="userDescription" required>
-    <label for="userDescription">User Description</label>
-     </div>
+{% block content %}
+    <div class="container">
+        <h1>upload</h1>
 
-    <div class="input-field col s6">
 
-    <div class="file-field input-field">
-      <div class="btn">
-        <span>File</span>
-        <input id="id_file" name="file" type="file" required>
-      </div>
-      <div class="file-path-wrapper">
-        <input  class="file-path validate" type="text">
-      </div>
+        <form method="POST" enctype="multipart/form-data" class="col s12">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="input-field col s4 push-s4 center">
+                    <input id="id_userDescription" type="text" name="userDescription"
+                           required>
+                    <label for="userDescription">User Description</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s4 push-s4 center">
+                    <div class="file-field input-field">
+                        <div class="btn">
+                            <span>File</span>
+                            <input id="id_file" name="file" type="file" required>
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s4 push-s4 center">
+                    <input id="id_public" name="public" type="checkbox" required checked="checked" class="left" {% if not user.is_authenticated %}  disabled="disabled" {% endif %}>
+                    <label for="id_public" class="left">add to public gallery</label>
+                    <button type="submit" name="_submit" class="btn right">Submit</button>
+                </div>
+            </div>
+        </form>
+
+
     </div>
-         </div>
-    <button type="submit" name="_submit" class="btn">Submit</button>
-
-</form>
-
-    </div>
-
-
 {% endblock %}
