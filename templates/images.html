@@ -4,8 +4,18 @@
 
 {% block content %}
     <div class="container">
+    <br><br>
 
-        {% for image in images %}
+
+    <div class="row">
+    <div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s6"><a class="active"  href="#augmented_images">Augmented Images</a></li>
+        <li class="tab col s6"><a href="#orginal_images">Original Images</a></li>
+      </ul>
+    </div>
+    <div id="augmented_images" class="col s12">
+        {% for image in augmented_images %}
 
             {% if forloop.counter0|divisibleby:4 %}
                 <div class="row">
@@ -33,22 +43,61 @@
     <script type="text/javascript">
 
 
-        function checkIfChanged(currentCount) {
-            renderCount = {{ renderCount }};
+        function checkIfChanged(currentCountAugmented, currentCountOriginal) {
+            renderCountAugmented = {{ renderCountAugmented }};
+            renderCountOriginal= {{ renderCountOriginal }};
 
-            console.log("renderCount: ", renderCount);
-            console.log("currentCount:", currentCount);
-            if (currentCount != renderCount) {
+            console.log("renderCountAugmented: ", renderCountAugmented);
+            console.log("renderCountOriginal: ", renderCountOriginal);
+            console.log("currentCountAugmented:", currentCountAugmented);
+            console.log("currentCountOriginal:", currentCountOriginal);
+
+            if (currentCountAugmented != renderCountAugmented || currentCountOriginal != renderCountOriginal) {
                 location.reload(true);
             }
 
         }
 
         setInterval(function (renderCount) {
-            $.getJSON(url = "{% if scope == "private" %}{% url "currentcount_private" %} {% else %} {% url "currentcount_public" %} {% endif %}", function (data) {
-                checkIfChanged(data.currentCount);
+            $.getJSON(url = "{% url "index" %}currentcount/{{ scope }}", function (data) {
+                checkIfChanged(data.currentCountAugmented, data.currentCountOriginal);
             });
         }, 5000);
 
     </script>
+    </div>
+    <div id="orginal_images" class="col s12">
+
+
+    {% for original_image in original_images %}
+
+
+
+            {% if forloop.counter0|divisibleby:4 %}
+                <div class="row">
+            {% endif %}
+        <div class="col s2 push-s2">
+            <div class="card">
+                <div class="card-image">
+                    <a href="{% url 'image_detail' original_image.id %}"> <img src="{{ original_image.file.url }}"></a>
+                </div>
+                <div class="card-content">
+                    <p>{{ original_image.userDescription }}</p>
+                </div>
+            </div>
+        </div>
+        {% if  forloop.counter0|add:1|divisibleby:4 %}
+            </div>
+        {% endif %}
+
+
+
+    {% endfor %}
+    </div>
+
+  </div>
+
+
+
+
 {% endblock %}

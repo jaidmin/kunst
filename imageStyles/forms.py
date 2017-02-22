@@ -16,6 +16,6 @@ class RegisterForm(Form):
 
 
 class CreateAugmentedForm(Form):
-    public = forms.BooleanField()
+    public = forms.BooleanField(initial=False, required=False)
     style = forms.ChoiceField(choices=[(style.id,style.name) for style in generatingModelStyle.objects.all()])
     user_description = forms.CharField(max_length=140)

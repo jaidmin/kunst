@@ -20,17 +20,25 @@ def index(request):
     return render(request, 'index.html')
 
 
-def images_private(request):
-    # originalImages = originalImage.objects.all()
-    augmentedImages = augmentedImage.objects.filter(owner=request.user)
-    renderCount = augmentedImages.count()
-    return render(request, 'images.html', {'images': augmentedImages, 'renderCount': renderCount, 'scope': "private"})
+def images(request,scope):
+
+    if scope == "private":
+        originalImages = originalImage.objects.filter(owner = request.user)
+        augmentedImages = augmentedImage.objects.filter(owner=request.user)
+    else:
+        originalImages = originalImage.objects.filter(public = True)
+        augmentedImages = augmentedImage.objects.filter(public = True)
+
+    renderCountAugmented = augmentedImages.count()
+    renderCountOriginal = originalImages.count()
+    return render(request, 'images.html', {'augmented_images': augmentedImages, 'renderCountAugmented': renderCountAugmented, 'renderCountOriginal': renderCountOriginal, 'scope': scope, 'original_images': originalImages})
 
 def images_public(request):
-    # originalImages = originalImage.objects.all()
+    originalImages = originalImage.objects.filter(public= True)
     augmentedImages = augmentedImage.objects.filter(public= True)
+
     renderCount = augmentedImages.count()
-    return render(request, 'images.html', {'images': augmentedImages, 'renderCount': renderCount,'scope': "public"})
+    return render(request, 'images.html', {'images': augmentedImages, 'renderCount': renderCount,'scope': "public", 'original_images': originalImages})
 
 
 
@@ -101,14 +109,20 @@ def register(request):
 
     return render(request, template_name='registration/register.html')
 
-def currentcount_private(request):
-    currentCount = augmentedImage.objects.filter(owner= request.user).count()
-    return JsonResponse({'currentCount':currentCount})
+def currentcount(request,scope,original_image_id=None):
+    if scope == "public":
+        currentCountAugmented = augmentedImage.objects.filter(public=True).count()
+        currentCountOriginal =  originalImage.objects.filter(public=True).count()
+        return JsonResponse({'currentCountAugmented': currentCountAugmented, 'currentCountOriginal': currentCountOriginal})
+    if scope == "private":
+        currentCountAugmented = augmentedImage.objects.filter(owner= request.user).count()
+        currentCountOriginal =  originalImage.objects.filter(owner= request.user).count()
+        return JsonResponse({'currentCountAugmented': currentCountAugmented, 'currentCountOriginal': currentCountOriginal})
+    if scope == "single_image":
+        currentCountAugmented = augmentedImage.objects.filter(originalImage.id == original_image_id).count()
+        return JsonResponse({'currentCountAugmented': currentCountAugmented})
+    return HttpResponse(status="404")
 
-
-def currentcount_public(request):
-    currentCount = augmentedImage.objects.filter(public=True).count()
-    return JsonResponse({'currentCount':currentCount})
 
 
 
@@ -124,7 +138,6 @@ def image_detail(request,original_image_id):
 
                 if form.is_valid():
                     public = form.cleaned_data['public']
-
                     style_id = form.cleaned_data['style']
                     user_description = form.cleaned_data['user_description']
 

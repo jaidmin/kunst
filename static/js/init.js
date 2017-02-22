@@ -3,6 +3,7 @@
 
       $('.button-collapse').sideNav();
       $('.parallax').parallax();
+      $('ul.tabs').tabs();
       $('.materialboxed').materialbox();
       $('.carousel').carousel();
       $('.slider').slider();

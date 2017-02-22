@@ -25,12 +25,18 @@ class generatingModel(models.Model):
     name = models.CharField(max_length=140)
     model_path = models.CharField(max_length=300)
 
+    def __unicode__(self):
+        return self.name
+
 class generatingModelStyle(models.Model):
     model = models.ForeignKey(generatingModel)
     name = models.CharField(max_length=140)
     number = models.IntegerField()
     description = models.CharField(max_length=140)
     image = models.ImageField()
+
+    def __unicode__(self):
+        return self.model.name + "_" + str(self.number)
 
 
 
@@ -39,6 +45,9 @@ class generatingModelStyle(models.Model):
 class augmentedImageOptions(models.Model):
     model = models.ForeignKey(generatingModel)
     style = models.ForeignKey(generatingModelStyle)
+
+    def __unicode__(self):
+        return self.model.name + "_" + str(self.style.number) + "_" + str(self.id)
 
 
 class augmentedImage(Image):
