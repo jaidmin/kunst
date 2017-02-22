@@ -3,20 +3,76 @@
 
 {% block  content %}
 
-        <div class="row">
-            <div class="col s4 center">
-                <img src="{{ original_image.file.url }}">
-            </div>
+    <div class="row">
+        <div class="col s4 push-s2 center">
+            <img class="materialboxed" src="{{ original_image.file.url }}">
+        </div>
 
-            <div class="col s8 center">
-                <div class="carousel">
+        <div class="col s4 push-s2 center">
+            <div class="slider">
+                <ul class="slides">
                     {% for image in augmented_images %}
-                        <a class="carousel-item"><img src="{{ image.file.url }}"></a>
-
+                        <li>
+                            <img class="materialboxed" src="{{ image.file.url }}">
+                        </li>
                     {% endfor %}
-                </div>
+                </ul>
             </div>
         </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <form method="POST" class="col s12">
+
+        <div class="row">
+            <div class="input-field col s4 push-s4 center">
+                <input id="id_user_description" type="text" name="user_description"
+                       required>
+                <label for="user_description">User Description</label>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="input-field col s4 push-s4 center">
+                <select id="id_style" name="style"  required>
+                <option value="" disabled selected>Choose your Style</option>
+                    {% for style in styles %}
+                        <option value="{{ style.id }}">{{ style.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="input-field col s4 push-s4 center">
+                <input id="id_public" name="public" type="checkbox" checked="checked" class="left">
+                <label for="id_public" class="left">add to public gallery</label>
+                <button type="submit" name="_submit" class="btn right">Submit</button>
+            </div>
+        </div>
+    </form>
+
+
+
+
+
+
+
+
+
 
 
 {% endblock %}

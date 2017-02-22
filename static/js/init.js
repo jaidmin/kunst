@@ -5,5 +5,15 @@
       $('.parallax').parallax();
       $('.materialboxed').materialbox();
       $('.carousel').carousel();
+      $('.slider').slider();
+      $('select').material_select();
+      $("form").submit(function() {
+    $("input").removeAttr("disabled");
+
+});
+
+
   }); // end of document ready
+
+
 })(jQuery); // end of jQuery name space

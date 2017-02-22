@@ -18,10 +18,36 @@ class originalImage(Image):
         return "original_image_" + str(self.id)
 
 
+
+
+
+class generatingModel(models.Model):
+    name = models.CharField(max_length=140)
+    model_path = models.CharField(max_length=300)
+
+class generatingModelStyle(models.Model):
+    model = models.ForeignKey(generatingModel)
+    name = models.CharField(max_length=140)
+    number = models.IntegerField()
+    description = models.CharField(max_length=140)
+    image = models.ImageField()
+
+
+
+
+
+class augmentedImageOptions(models.Model):
+    model = models.ForeignKey(generatingModel)
+    style = models.ForeignKey(generatingModelStyle)
+
+
 class augmentedImage(Image):
-    options = models.CharField(max_length=200)
+    options = models.ForeignKey(augmentedImageOptions)
     originalImage = models.ForeignKey(originalImage, on_delete=models.CASCADE, null=True)
     thumbnail = models.ImageField()
 
     def __unicode__(self):
         return "augmented_image_" + str(self.id)
+
+
+

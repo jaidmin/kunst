@@ -5,7 +5,7 @@ from django.utils import timezone
 from PIL import Image
 from io import BytesIO
 import base64
-from models import augmentedImage, originalImage
+from models import augmentedImage, originalImage, generatingModel, generatingModelStyle, augmentedImageOptions
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import PIL.Image
 
@@ -25,20 +25,28 @@ from scipy.ndimage import convolve
 import PIL.Image
 
 
-# import the logging library
-import logging
-
-# Get an instance of a logger
 
 
 
 @shared_task
-def generateAugmentedImage(imageStringEncoded,originalImageId, userDescription, public):
+def generateAugmentedImage(imageStringEncoded,originalImageId, userDescription, public, model_id, style_number):
+
+
+
+    model = generatingModel.objects.get(id=model_id)
+    style = generatingModelStyle.objects.get(model=model, number=style_number)
+
+    options = augmentedImageOptions(model=model, style=style)
+    options.save()
+
     imageStringDecoded = BytesIO(base64.b64decode(imageStringEncoded))
     incomingImage = PIL.Image.open(imageStringDecoded)
     time = timezone.now()
     imageArray = np.expand_dims((np.array(incomingImage,dtype='float32') / 255),0)
-    results = _multiple_images(imageArray,[3])
+
+    #call to magenta method -- here the magic happens
+    results = _multiple_images(input_image=imageArray,style_model=model, style=style)
+
     imageName = str(uuid.uuid4()) + '.jpg'
     processedPILImage = results[1]
     processedImageBytes = BytesIO()
@@ -67,13 +75,14 @@ def generateAugmentedImage(imageStringEncoded,originalImageId, userDescription, 
         file=new_processed,
         userDescription=userDescription,
         pubDate=time,
-        options="still have to think about that",
+        options=options,
         originalImage= originalImage.objects.get(id=originalImageId),
         thumbnail = thumbnail_processed,
         public = public,
         owner= originalImage.objects.get(id=originalImageId).owner
     )
     finalaugmented.save()
+
 
 
 
@@ -87,8 +96,10 @@ def _load_checkpoint(sess, checkpoint):
   model_saver.restore(sess, checkpoint)
 
 
-def _multiple_images(input_image, which_styles):
+def _multiple_images(input_image, style_model, style):
   """Stylizes an image into a set of styles and returns array of tuples with style as first and PIL image as second element"""
+  which_styles  = [style.number]
+
   with tf.Graph().as_default(), tf.Session() as sess:
     stylized_images = model.transform(
         input_image,
@@ -97,7 +108,8 @@ def _multiple_images(input_image, which_styles):
             'num_categories': 10, # monet has 10 categories varied has 34
             'center': True,
             'scale': True})
-    _load_checkpoint(sess, '/home/jaidmin/PycharmProjects/kunst/imageStyles/tensorflow_models/monet.ckpt')
+    #_load_checkpoint(sess, '/home/jaidmin/PycharmProjects/kunst/imageStyles/tensorflow_models/monet.ckpt')
+    _load_checkpoint(sess,style_model.model_path)
 
     stylized_image = stylized_images.eval()
     results = []
